@@ -1,0 +1,3949 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<title>Electricity Saver</title>
+
+<style>
+
+/* =========================
+   GENERAL
+========================= */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Trebuchet MS", Arial, sans-serif;
+    margin: 0;
+    background: #f5f7fa;
+    color: #333333;
+}
+
+header {
+    background: #176b3a;
+    color: white;
+    padding: 25px;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 32px;
+}
+
+header p {
+    margin: 8px 0 0;
+}
+
+nav {
+    background: white;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+nav button {
+    background: #176b3a;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+nav button:hover,
+nav button.active {
+    background: #d85b91;
+}
+
+.container {
+    width: 92%;
+    max-width: 1200px;
+    margin: 25px auto;
+}
+
+section {
+    display: none;
+}
+
+section.active {
+    display: block;
+}
+
+.card {
+    background: white;
+    padding: 22px;
+    margin-bottom: 20px;
+    border-radius: 15px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+}
+
+.card h2,
+.card h3 {
+    color: #176b3a;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 11px;
+    margin: 7px 0;
+    border: 1px solid #cccccc;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+button {
+    background: #176b3a;
+    color: white;
+    border: none;
+    padding: 11px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #d85b91;
+}
+
+.delete-btn {
+    background: #c94c70;
+}
+
+.delete-btn:hover {
+    background: #a83255;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+
+.stat {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+}
+
+.stat h2 {
+    color: #d85b91;
+    margin: 8px 0;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+th {
+    background: #176b3a;
+    color: white;
+    padding: 10px;
+}
+
+td {
+    padding: 10px;
+    border-bottom: 1px solid #dddddd;
+    text-align: center;
+}
+
+tr:hover {
+    background: #fff0f6;
+}
+
+.bar-container {
+    background: #eeeeee;
+    height: 25px;
+    border-radius: 15px;
+    overflow: hidden;
+    margin: 10px 0;
+}
+
+.bar {
+    background: #d85b91;
+    height: 100%;
+    width: 0%;
+    transition: width 0.5s;
+}
+
+.goal-box {
+    background: #fff0f6;
+    border-left: 6px solid #d85b91;
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 12px;
+}
+
+.money-positive {
+    color: #176b3a;
+    font-weight: bold;
+}
+
+.money-negative {
+    color: #c0395b;
+    font-weight: bold;
+}
+
+.goal-met {
+    color: #176b3a;
+    font-weight: bold;
+}
+
+.highlight {
+    color: #d85b91;
+    font-weight: bold;
+}
+
+.result {
+    background: #f8fff9;
+    border: 1px solid #b9ddc5;
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 12px;
+}
+
+.warning {
+    background: #fff4f6;
+    border: 1px solid #efb5c5;
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 12px;
+}
+
+.search-box {
+    margin-bottom: 15px;
+}
+
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f5f7fa;
+}
+
+.login-box {
+    width: 90%;
+    max-width: 430px;
+    background: white;
+    padding: 35px;
+    border-radius: 18px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.12);
+    text-align: center;
+}
+
+.login-box h1 {
+    color: #176b3a;
+}
+
+.logout {
+    background: #c94c70;
+    float: right;
+}
+
+.small {
+    font-size: 13px;
+    color: #666666;
+}
+
+@media(max-width: 800px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    table {
+        display: block;
+        overflow-x: auto;
+    }
+}
+
+
+/* =========================
+   CHART
+========================= */
+
+.chart-area {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    height: 230px;
+    padding: 20px 10px;
+    border-bottom: 2px solid #176b3a;
+}
+
+.chart-column {
+    flex: 1;
+    text-align: center;
+}
+
+.chart-column .bar {
+    width: 100%;
+    min-height: 2px;
+    border-radius: 8px 8px 0 0;
+    background: #d85b91;
+}
+
+.chart-label {
+    margin-top: 8px;
+    font-size: 12px;
+}
+
+
+/* =========================
+   LOGIN
+========================= */
+
+#mainApp {
+    display: none;
+}
+
+
+/* =========================
+   DASHBOARD GOAL RESULT
+========================= */
+
+.goal-result-card {
+    background: #fff7fa;
+    border: 1px solid #f0bfd0;
+    padding: 16px;
+    border-radius: 12px;
+    margin-top: 15px;
+    line-height: 1.8;
+}
+
+.goal-result-card strong {
+    color: #176b3a;
+}
+
+</style>
+</head>
+
+<body>
+
+
+<!-- =========================
+     LOGIN PAGE
+========================= -->
+
+<div id="loginPage" class="login-page">
+
+    <div class="login-box">
+
+        <h1>⚡ Electricity Saver</h1>
+
+        <p>Track your electricity usage and reduce wastage.</p>
+
+        <input type="text" id="loginName" placeholder="Enter your name">
+
+        <input type="email" id="loginEmail" placeholder="Enter your email">
+
+        <button onclick="login()">Login</button>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     MAIN APPLICATION
+========================= -->
+
+<div id="mainApp">
+
+<header>
+
+    <button class="logout" onclick="logout()">Logout</button>
+
+    <h1>⚡ Electricity Saver</h1>
+
+    <p>Smart Electricity Monitoring & Saving Dashboard</p>
+
+</header>
+
+
+<nav>
+
+    <button onclick="showSection('dashboard', this)" class="active">
+        Dashboard
+    </button>
+
+    <button onclick="showSection('appliances', this)">
+        Appliances
+    </button>
+
+    <button onclick="showSection('monthly', this)">
+        Monthly Usage
+    </button>
+
+    <button onclick="showSection('goals', this)">
+        Saving Goals
+    </button>
+
+    <button onclick="showSection('analysis', this)">
+        Analysis
+    </button>
+
+    <button onclick="showSection('totalCost', this)">
+        Total Energy & Cost
+    </button>
+
+    <button onclick="showSection('calculator', this)">
+        Savings Calculator
+    </button>
+
+</nav>
+
+
+<div class="container">
+
+
+<!-- =========================
+     DASHBOARD
+========================= -->
+
+<section id="dashboard" class="active">
+
+    <div class="card">
+
+        <h2>Welcome, <span id="welcomeName"></span> 👋</h2>
+
+        <p>
+            Monitor your electricity consumption,
+            identify wastage and save money.
+        </p>
+
+    </div>
+
+
+    <div class="grid">
+
+        <div class="stat">
+
+            <p>Total Appliances</p>
+
+            <h2 id="totalAppliances">0</h2>
+
+        </div>
+
+
+        <div class="stat">
+
+            <p>Monthly Energy</p>
+
+            <h2 id="dashboardEnergy">0 kWh</h2>
+
+        </div>
+
+
+        <div class="stat">
+
+            <p>Monthly Cost</p>
+
+            <h2 id="dashboardCost">₹0</h2>
+
+        </div>
+
+    </div>
+
+
+    <!-- DASHBOARD APPLIANCE -->
+
+    <div class="card">
+
+        <h2>Add Appliance</h2>
+
+        <input type="text" id="dashApplianceName"
+               placeholder="Appliance name">
+
+        <input type="number" id="dashAppliancePower"
+               placeholder="Power in Watts">
+
+        <input type="number" id="dashApplianceHours"
+               placeholder="Hours used per day">
+
+        <input type="number" id="dashApplianceQuantity"
+               placeholder="Quantity" value="1">
+
+        <input type="number" id="dashApplianceRate"
+               placeholder="Electricity rate ₹/kWh" value="8">
+
+        <button onclick="addDashboardAppliance()">
+            Add Appliance
+        </button>
+
+    </div>
+
+
+    <!-- DASHBOARD GOAL -->
+
+    <div class="card">
+
+        <h2>Set Appliance Goal</h2>
+
+        <select id="dashGoalAppliance"
+                onchange="showSelectedApplianceGoal()">
+
+            <option value="">Select Appliance</option>
+
+        </select>
+
+        <input type="number"
+               id="dashGoalHours"
+               placeholder="Goal hours per day">
+
+        <button onclick="setApplianceGoal()">
+            Set Goal
+        </button>
+
+        <div id="applianceGoalResult"
+             class="goal-result-card">
+
+            Select an appliance to see its goal information.
+
+        </div>
+
+    </div>
+
+
+    <!-- MONTHLY GOAL -->
+
+    <div class="card">
+
+        <h2>Monthly Saving Goal</h2>
+
+        <input type="number"
+               id="dashboardMonthlyGoal"
+               placeholder="Maximum monthly energy goal in kWh">
+
+        <button onclick="setMonthlyGoal()">
+            Set Monthly Goal
+        </button>
+
+        <div class="goal-box">
+
+            <div class="bar-container">
+
+                <div id="dashGoalBar"
+                     class="bar"></div>
+
+            </div>
+
+            <p id="dashGoalText">
+                No monthly goal set.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Most Used Appliance</h2>
+
+        <div id="mostUsed">
+            No appliances added yet.
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Smart Summary</h2>
+
+        <div id="smartSummary">
+            Add appliances to generate a summary.
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Appliance Energy Chart</h2>
+
+        <div id="applianceChart"
+             class="chart-area">
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     APPLIANCES
+========================= -->
+
+<section id="appliances">
+
+    <div class="card">
+
+        <h2>Add Appliance</h2>
+
+        <input type="text"
+               id="applianceName"
+               placeholder="Appliance name">
+
+        <input type="number"
+               id="appliancePower"
+               placeholder="Power in Watts">
+
+        <input type="number"
+               id="applianceHours"
+               placeholder="Hours used per day">
+
+        <input type="number"
+               id="applianceQuantity"
+               placeholder="Quantity"
+               value="1">
+
+        <input type="number"
+               id="applianceRate"
+               placeholder="Electricity rate ₹/kWh"
+               value="8">
+
+        <button onclick="addAppliance()">
+            Add Appliance
+        </button>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Your Appliances</h2>
+
+        <input type="text"
+               id="applianceSearch"
+               class="search-box"
+               placeholder="Search appliance..."
+               oninput="updateApplianceTable()">
+
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Appliance</th>
+                    <th>Power</th>
+                    <th>Hours/Day</th>
+                    <th>Quantity</th>
+                    <th>Daily kWh</th>
+                    <th>Monthly kWh</th>
+                    <th>Monthly Cost</th>
+                    <th>Goal</th>
+                    <th>Action</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="applianceTable">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     MONTHLY USAGE
+========================= -->
+
+<section id="monthly">
+
+    <div class="card">
+
+        <h2>Monthly Usage</h2>
+
+        <input type="text"
+               id="monthName"
+               placeholder="Month e.g. January">
+
+        <input type="number"
+               id="monthEnergy"
+               placeholder="Energy used in kWh">
+
+        <button onclick="addMonth()">
+            Add Month
+        </button>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Monthly Records</h2>
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Month</th>
+                    <th>Energy (kWh)</th>
+                    <th>Action</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="monthlyTable">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Monthly Energy Chart</h2>
+
+        <div id="monthlyChart"
+             class="chart-area">
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     SAVING GOALS
+========================= -->
+
+<section id="goals">
+
+    <div class="card">
+
+        <h2>Appliance Saving Goal</h2>
+
+        <select id="pageGoalAppliance"
+                onchange="showPageApplianceGoal()">
+
+            <option value="">Select Appliance</option>
+
+        </select>
+
+        <input type="number"
+               id="pageGoalHours"
+               placeholder="Goal hours per day">
+
+        <button onclick="setPageApplianceGoal()">
+            Set Appliance Goal
+        </button>
+
+        <div id="pageApplianceGoalResult"
+             class="goal-result-card">
+
+            Select an appliance to see its goal information.
+
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Monthly Energy Goal</h2>
+
+        <input type="number"
+               id="pageMonthlyGoal"
+               placeholder="Monthly energy goal in kWh">
+
+        <button onclick="setGoal()">
+            Set Monthly Goal
+        </button>
+
+        <div class="goal-box">
+
+            <div class="bar-container">
+
+                <div id="goalBar"
+                     class="bar"></div>
+
+            </div>
+
+            <p id="goalText">
+                No goal set.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Monthly Usage Chart</h2>
+
+        <div id="monthlyChartPage"
+             class="chart-area">
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     ANALYSIS
+========================= -->
+
+<section id="analysis">
+
+    <div class="card">
+
+        <h2>Energy Analysis</h2>
+
+        <div id="analysisContent">
+
+            Add appliances to generate analysis.
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     TOTAL ENERGY & COST
+========================= -->
+
+<section id="totalCost">
+
+    <div class="card">
+
+        <h2>Total Energy & Cost</h2>
+
+        <div id="totalCostContent">
+
+            No data available.
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     SAVINGS CALCULATOR
+========================= -->
+
+<section id="calculator">
+
+    <div class="card">
+
+        <h2>Savings Calculator</h2>
+
+        <input type="number"
+               id="currentEnergy"
+               placeholder="Current monthly energy (kWh)">
+
+        <input type="number"
+               id="reductionPercent"
+               placeholder="Reduction percentage">
+
+        <input type="number"
+               id="calculatorRate"
+               placeholder="Electricity rate ₹/kWh"
+               value="8">
+
+        <button onclick="calculateSavings()">
+            Calculate Savings
+        </button>
+
+        <div id="savingResult"
+             class="result">
+
+            Enter values to calculate.
+
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Appliance Money Impact</h2>
+
+        <select id="moneyAppliance"
+                onchange="updateMoneyApplianceInfo()">
+
+            <option value="">Select Appliance</option>
+
+        </select>
+
+        <div id="moneyApplianceInfo"
+             class="result">
+
+            Select an appliance.
+
+        </div>
+
+        <input type="number"
+               id="newApplianceHours"
+               placeholder="New hours per day">
+
+        <button onclick="calculateApplianceMoneyImpact()">
+            Calculate Impact
+        </button>
+
+        <div id="applianceMoneyResult"
+             class="result">
+
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Monthly Money Impact</h2>
+
+        <input type="number"
+               id="newMonthlyEnergy"
+               placeholder="New monthly energy in kWh">
+
+        <button onclick="calculateMonthlyMoneyImpact()">
+            Calculate Impact
+        </button>
+
+        <div id="monthlyMoneyResult"
+             class="result">
+
+        </div>
+
+    </div>
+
+</section>
+
+
+</div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   DATA
+========================================================= */
+
+let appliances = [];
+let monthlyData = [];
+let monthlyGoal = 0;
+
+
+/* =========================================================
+   LOGIN
+========================================================= */
+
+function login() {
+
+    const name =
+        document.getElementById("loginName").value.trim();
+
+    const email =
+        document.getElementById("loginEmail").value.trim();
+
+    if (!name || !email) {
+
+        alert("Please enter your name and email.");
+
+        return;
+
+    }
+
+    localStorage.setItem("electricityUser", name);
+    localStorage.setItem("electricityEmail", email);
+
+    document.getElementById("loginPage").style.display = "none";
+    document.getElementById("mainApp").style.display = "block";
+
+    loadData();
+
+    document.getElementById("welcomeName").textContent = name;
+
+    refreshAll();
+
+}
+
+
+function logout() {
+
+    document.getElementById("mainApp").style.display = "none";
+
+    document.getElementById("loginPage").style.display = "flex";
+
+}
+
+
+/* =========================================================
+   LOCAL STORAGE
+========================================================= */
+
+function loadData() {
+
+    appliances =
+        JSON.parse(
+            localStorage.getItem("electricityAppliances")
+        ) || [];
+
+    monthlyData =
+        JSON.parse(
+            localStorage.getItem("electricityMonthlyData")
+        ) || [];
+
+    monthlyGoal =
+        Number(
+            localStorage.getItem("electricityMonthlyGoal")
+        ) || 0;
+
+}
+
+
+function saveData() {
+
+    localStorage.setItem(
+        "electricityAppliances",
+        JSON.stringify(appliances)
+    );
+
+    localStorage.setItem(
+        "electricityMonthlyData",
+        JSON.stringify(monthlyData)
+    );
+
+    localStorage.setItem(
+        "electricityMonthlyGoal",
+        monthlyGoal
+    );
+
+}
+
+
+/* =========================================================
+   SECTION NAVIGATION
+========================================================= */
+
+function showSection(id, button) {
+
+    document.querySelectorAll("section").forEach(section => {
+
+        section.classList.remove("active");
+
+    });
+
+    document.getElementById(id).classList.add("active");
+
+
+    document.querySelectorAll("nav button").forEach(btn => {
+
+        btn.classList.remove("active");
+
+    });
+
+
+    if (button) {
+
+        button.classList.add("active");
+
+    }
+
+    refreshAll();
+
+}
+
+
+/* =========================================================
+   ADD APPLIANCE
+========================================================= */
+
+function createAppliance(
+    name,
+    power,
+    hours,
+    quantity,
+    rate
+) {
+
+    name = String(name).trim();
+
+    power = Number(power);
+    hours = Number(hours);
+    quantity = Number(quantity);
+    rate = Number(rate);
+
+
+    if (
+        !name ||
+        power <= 0 ||
+        hours < 0 ||
+        quantity <= 0 ||
+        rate <= 0
+    ) {
+
+        alert("Please enter valid appliance details.");
+
+        return false;
+
+    }
+
+
+    appliances.push({
+
+        name: name,
+        power: power,
+        hours: hours,
+        quantity: quantity,
+        rate: rate,
+
+        // 0 means no goal has been set
+        goalHours: 0
+
+    });
+
+
+    saveData();
+
+    refreshAll();
+
+    return true;
+
+}
+
+
+function addDashboardAppliance() {
+
+    const name =
+        document.getElementById("dashApplianceName").value;
+
+    const power =
+        document.getElementById("dashAppliancePower").value;
+
+    const hours =
+        document.getElementById("dashApplianceHours").value;
+
+    const quantity =
+        document.getElementById("dashApplianceQuantity").value;
+
+    const rate =
+        document.getElementById("dashApplianceRate").value;
+
+
+    if (
+        createAppliance(
+            name,
+            power,
+            hours,
+            quantity,
+            rate
+        )
+    ) {
+
+        document.getElementById("dashApplianceName").value = "";
+        document.getElementById("dashAppliancePower").value = "";
+        document.getElementById("dashApplianceHours").value = "";
+
+    }
+
+}
+
+
+function addAppliance() {
+
+    const name =
+        document.getElementById("applianceName").value;
+
+    const power =
+        document.getElementById("appliancePower").value;
+
+    const hours =
+        document.getElementById("applianceHours").value;
+
+    const quantity =
+        document.getElementById("applianceQuantity").value;
+
+    const rate =
+        document.getElementById("applianceRate").value;
+
+
+    if (
+        createAppliance(
+            name,
+            power,
+            hours,
+            quantity,
+            rate
+        )
+    ) {
+
+        document.getElementById("applianceName").value = "";
+        document.getElementById("appliancePower").value = "";
+        document.getElementById("applianceHours").value = "";
+
+    }
+
+}
+
+
+/* =========================================================
+   ENERGY CALCULATIONS
+========================================================= */
+
+function dailyKwh(appliance) {
+
+    return (
+        Number(appliance.power) *
+        Number(appliance.hours) *
+        Number(appliance.quantity)
+    ) / 1000;
+
+}
+
+
+function monthlyKwh(appliance) {
+
+    return dailyKwh(appliance) * 30;
+
+}
+
+
+function monthlyCost(appliance) {
+
+    return monthlyKwh(appliance) *
+           Number(appliance.rate);
+
+}
+
+
+/* =========================================================
+   ⭐ NEW GOAL COMPARISON LOGIC
+========================================================= */
+
+function getApplianceGoalResult(appliance) {
+
+    const goalHours =
+        Number(appliance.goalHours) || 0;
+
+    if (goalHours <= 0) {
+
+        return null;
+
+    }
+
+
+    const currentHours =
+        Number(appliance.hours) || 0;
+
+    const power =
+        Number(appliance.power) || 0;
+
+    const quantity =
+        Number(appliance.quantity) || 1;
+
+    const rate =
+        Number(appliance.rate) || 0;
+
+
+    /*
+       Difference between actual usage
+       and target usage.
+    */
+
+    const hoursDifference =
+        currentHours - goalHours;
+
+
+    /*
+       Energy difference per month:
+
+       Power(W) × Difference(hours/day)
+       × Quantity × 30 / 1000
+    */
+
+    const energyDifference =
+        (
+            power *
+            Math.abs(hoursDifference) *
+            quantity *
+            30
+        ) / 1000;
+
+
+    /*
+       Money difference.
+    */
+
+    const moneyDifference =
+        energyDifference * rate;
+
+
+    /*
+       Energy and cost if the user follows
+       the goal.
+    */
+
+    const goalMonthlyEnergy =
+        (
+            power *
+            goalHours *
+            quantity *
+            30
+        ) / 1000;
+
+
+    const goalMonthlyCost =
+        goalMonthlyEnergy * rate;
+
+
+    const currentMonthlyEnergy =
+        monthlyKwh(appliance);
+
+
+    const currentMonthlyCost =
+        monthlyCost(appliance);
+
+
+    let status;
+
+
+    if (hoursDifference > 0) {
+
+        status = "extra";
+
+    }
+    else if (hoursDifference < 0) {
+
+        status = "saving";
+
+    }
+    else {
+
+        status = "met";
+
+    }
+
+
+    return {
+
+        status: status,
+
+        currentHours: currentHours,
+
+        goalHours: goalHours,
+
+        hoursDifference: Math.abs(hoursDifference),
+
+        energyDifference: energyDifference,
+
+        moneyDifference: moneyDifference,
+
+        currentMonthlyEnergy: currentMonthlyEnergy,
+
+        currentMonthlyCost: currentMonthlyCost,
+
+        goalMonthlyEnergy: goalMonthlyEnergy,
+
+        goalMonthlyCost: goalMonthlyCost
+
+    };
+
+}
+
+
+/* =========================================================
+   GOAL HTML
+========================================================= */
+
+function getGoalDisplayHTML(appliance) {
+
+    const result =
+        getApplianceGoalResult(appliance);
+
+
+    if (!result) {
+
+        return `
+            <span class="small">
+                No goal set
+            </span>
+        `;
+
+    }
+
+
+    if (result.status === "extra") {
+
+        return `
+
+            <strong>${result.goalHours} hrs/day</strong>
+
+            <br>
+
+            <span class="money-negative">
+                ⚠️ ${result.energyDifference.toFixed(2)}
+                kWh extra/month
+            </span>
+
+            <br>
+
+            <span class="money-negative">
+                ₹${result.moneyDifference.toFixed(2)}
+                extra/month
+            </span>
+
+        `;
+
+    }
+
+
+    if (result.status === "saving") {
+
+        return `
+
+            <strong>${result.goalHours} hrs/day</strong>
+
+            <br>
+
+            <span class="money-positive">
+                ✅ ${result.energyDifference.toFixed(2)}
+                kWh saved/month
+            </span>
+
+            <br>
+
+            <span class="money-positive">
+                ₹${result.moneyDifference.toFixed(2)}
+                saved/month
+            </span>
+
+        `;
+
+    }
+
+
+    return `
+
+        <strong>${result.goalHours} hrs/day</strong>
+
+        <br>
+
+        <span class="goal-met">
+            🎯 Goal met
+        </span>
+
+        <br>
+
+        <span class="small">
+            0 kWh difference
+        </span>
+
+    `;
+
+}
+
+
+/* =========================================================
+   APPLIANCE TABLE
+========================================================= */
+
+function updateApplianceTable() {
+
+    const table =
+        document.getElementById("applianceTable");
+
+    const search =
+        document.getElementById("applianceSearch")
+            .value
+            .toLowerCase()
+            .trim();
+
+
+    table.innerHTML = "";
+
+
+    appliances.forEach((appliance, index) => {
+
+        if (
+            search &&
+            !appliance.name
+                .toLowerCase()
+                .includes(search)
+        ) {
+
+            return;
+
+        }
+
+
+        const daily =
+            dailyKwh(appliance);
+
+        const monthly =
+            monthlyKwh(appliance);
+
+        const cost =
+            monthlyCost(appliance);
+
+
+        const row =
+            document.createElement("tr");
+
+
+        row.innerHTML = `
+
+            <td>
+                ${appliance.name}
+            </td>
+
+            <td>
+                ${appliance.power} W
+            </td>
+
+            <td>
+                ${appliance.hours}
+            </td>
+
+            <td>
+                ${appliance.quantity}
+            </td>
+
+            <td>
+                ${daily.toFixed(2)}
+            </td>
+
+            <td>
+                ${monthly.toFixed(2)}
+            </td>
+
+            <td>
+                ₹${cost.toFixed(2)}
+            </td>
+
+            <td>
+                ${getGoalDisplayHTML(appliance)}
+            </td>
+
+            <td>
+
+                <button
+                    class="delete-btn"
+                    onclick="deleteAppliance(${index})">
+
+                    Delete
+
+                </button>
+
+            </td>
+
+        `;
+
+
+        table.appendChild(row);
+
+    });
+
+}
+
+
+/* =========================================================
+   DELETE APPLIANCE
+========================================================= */
+
+function deleteAppliance(index) {
+
+    if (
+        !confirm(
+            "Are you sure you want to delete this appliance?"
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    appliances.splice(index, 1);
+
+    saveData();
+
+    refreshAll();
+
+}
+
+
+/* =========================================================
+   APPLIANCE DROPDOWNS
+========================================================= */
+
+function updateApplianceDropdowns() {
+
+    const dropdowns = [
+
+        document.getElementById("dashGoalAppliance"),
+
+        document.getElementById("pageGoalAppliance"),
+
+        document.getElementById("moneyAppliance")
+
+    ];
+
+
+    dropdowns.forEach(dropdown => {
+
+        if (!dropdown) return;
+
+
+        const oldValue =
+            dropdown.value;
+
+
+        dropdown.innerHTML = `
+
+            <option value="">
+                Select Appliance
+            </option>
+
+        `;
+
+
+        appliances.forEach((appliance, index) => {
+
+            const option =
+                document.createElement("option");
+
+            option.value = index;
+
+            option.textContent =
+                appliance.name;
+
+            dropdown.appendChild(option);
+
+        });
+
+
+        if (
+            oldValue !== "" &&
+            appliances[Number(oldValue)]
+        ) {
+
+            dropdown.value = oldValue;
+
+        }
+
+    });
+
+}
+
+
+/* =========================================================
+   DASHBOARD APPLIANCE GOAL INFORMATION
+========================================================= */
+
+function showSelectedApplianceGoal() {
+
+    const index =
+        document.getElementById(
+            "dashGoalAppliance"
+        ).value;
+
+
+    const result =
+        document.getElementById(
+            "applianceGoalResult"
+        );
+
+
+    if (index === "") {
+
+        result.innerHTML =
+            "Select an appliance to see its goal information.";
+
+        return;
+
+    }
+
+
+    const appliance =
+        appliances[Number(index)];
+
+
+    if (!appliance) {
+
+        result.innerHTML =
+            "Select an appliance.";
+
+        return;
+
+    }
+
+
+    const goalResult =
+        getApplianceGoalResult(appliance);
+
+
+    let goalInformation = "";
+
+
+    if (!goalResult) {
+
+        goalInformation = `
+
+            <br>
+
+            <span class="small">
+                No goal set yet.
+            </span>
+
+        `;
+
+    }
+    else if (goalResult.status === "extra") {
+
+        goalInformation = `
+
+            <br><br>
+
+            <span class="money-negative">
+
+                ⚠️ You are using
+                ${goalResult.hoursDifference.toFixed(2)}
+                extra hour(s) per day.
+
+                <br>
+
+                That is
+                ${goalResult.energyDifference.toFixed(2)}
+                kWh extra per month.
+
+                <br>
+
+                Extra cost:
+                ₹${goalResult.moneyDifference.toFixed(2)}
+                per month.
+
+            </span>
+
+        `;
+
+    }
+    else if (goalResult.status === "saving") {
+
+        goalInformation = `
+
+            <br><br>
+
+            <span class="money-positive">
+
+                ✅ You are using
+                ${goalResult.hoursDifference.toFixed(2)}
+                fewer hour(s) per day.
+
+                <br>
+
+                You are saving
+                ${goalResult.energyDifference.toFixed(2)}
+                kWh per month.
+
+                <br>
+
+                Money saved:
+                ₹${goalResult.moneyDifference.toFixed(2)}
+                per month.
+
+            </span>
+
+        `;
+
+    }
+    else {
+
+        goalInformation = `
+
+            <br><br>
+
+            <span class="goal-met">
+
+                🎯 Your usage exactly matches
+                your goal.
+
+                <br>
+
+                Energy difference:
+                0 kWh/month
+
+                <br>
+
+                Cost difference:
+                ₹0/month
+
+            </span>
+
+        `;
+
+    }
+
+
+    result.innerHTML = `
+
+        <strong>${appliance.name}</strong>
+
+        <br>
+
+        Current usage:
+        ${appliance.hours} hours/day
+
+        <br>
+
+        Goal:
+        ${
+            goalResult
+                ? goalResult.goalHours + " hours/day"
+                : "Not set"
+        }
+
+        <br>
+
+        Current monthly energy:
+        ${monthlyKwh(appliance).toFixed(2)} kWh
+
+        <br>
+
+        Current monthly cost:
+        ₹${monthlyCost(appliance).toFixed(2)}
+
+        ${
+            goalResult
+                ? `
+                    <br>
+
+                    Goal monthly energy:
+                    ${goalResult.goalMonthlyEnergy.toFixed(2)}
+                    kWh
+
+                    <br>
+
+                    Goal monthly cost:
+                    ₹${goalResult.goalMonthlyCost.toFixed(2)}
+                  `
+                : ""
+        }
+
+        ${goalInformation}
+
+    `;
+
+}
+
+
+/* =========================================================
+   SET DASHBOARD APPLIANCE GOAL
+========================================================= */
+
+function setApplianceGoal() {
+
+    const index =
+        document.getElementById(
+            "dashGoalAppliance"
+        ).value;
+
+
+    const goalHours =
+        Number(
+            document.getElementById(
+                "dashGoalHours"
+            ).value
+        );
+
+
+    if (index === "") {
+
+        alert("Please select an appliance.");
+
+        return;
+
+    }
+
+
+    if (goalHours <= 0) {
+
+        alert("Please enter a goal greater than 0 hours.");
+
+        return;
+
+    }
+
+
+    appliances[Number(index)].goalHours =
+        goalHours;
+
+
+    saveData();
+
+    refreshAll();
+
+
+    /*
+       Keep the selected appliance selected
+       and immediately show the updated result.
+    */
+
+    document.getElementById(
+        "dashGoalAppliance"
+    ).value = index;
+
+
+    document.getElementById(
+        "dashGoalHours"
+    ).value = "";
+
+
+    showSelectedApplianceGoal();
+
+}
+
+
+/* =========================================================
+   SAVING GOALS PAGE
+========================================================= */
+
+function showPageApplianceGoal() {
+
+    const index =
+        document.getElementById(
+            "pageGoalAppliance"
+        ).value;
+
+
+    const result =
+        document.getElementById(
+            "pageApplianceGoalResult"
+        );
+
+
+    if (index === "") {
+
+        result.innerHTML =
+            "Select an appliance to see its goal information.";
+
+        return;
+
+    }
+
+
+    const appliance =
+        appliances[Number(index)];
+
+
+    if (!appliance) {
+
+        result.innerHTML =
+            "Select an appliance.";
+
+        return;
+
+    }
+
+
+    const goalResult =
+        getApplianceGoalResult(appliance);
+
+
+    if (!goalResult) {
+
+        result.innerHTML = `
+
+            <strong>${appliance.name}</strong>
+
+            <br><br>
+
+            Current usage:
+            ${appliance.hours} hours/day
+
+            <br>
+
+            Current monthly energy:
+            ${monthlyKwh(appliance).toFixed(2)} kWh
+
+            <br>
+
+            Current monthly cost:
+            ₹${monthlyCost(appliance).toFixed(2)}
+
+            <br><br>
+
+            <span class="small">
+                No goal set yet.
+            </span>
+
+        `;
+
+        return;
+
+    }
+
+
+    if (goalResult.status === "extra") {
+
+        result.innerHTML = `
+
+            <strong>${appliance.name}</strong>
+
+            <br>
+
+            Current usage:
+            ${goalResult.currentHours} hours/day
+
+            <br>
+
+            Goal:
+            ${goalResult.goalHours} hours/day
+
+            <br><br>
+
+            Current monthly energy:
+            ${goalResult.currentMonthlyEnergy.toFixed(2)}
+            kWh
+
+            <br>
+
+            Goal monthly energy:
+            ${goalResult.goalMonthlyEnergy.toFixed(2)}
+            kWh
+
+            <br>
+
+            Current monthly cost:
+            ₹${goalResult.currentMonthlyCost.toFixed(2)}
+
+            <br>
+
+            Goal monthly cost:
+            ₹${goalResult.goalMonthlyCost.toFixed(2)}
+
+            <br><br>
+
+            <span class="money-negative">
+
+                ⚠️ EXTRA USAGE
+
+                <br>
+
+                ${goalResult.hoursDifference.toFixed(2)}
+                extra hour(s)/day
+
+                <br>
+
+                ${goalResult.energyDifference.toFixed(2)}
+                kWh extra/month
+
+                <br>
+
+                ₹${goalResult.moneyDifference.toFixed(2)}
+                extra/month
+
+            </span>
+
+        `;
+
+    }
+    else if (goalResult.status === "saving") {
+
+        result.innerHTML = `
+
+            <strong>${appliance.name}</strong>
+
+            <br>
+
+            Current usage:
+            ${goalResult.currentHours} hours/day
+
+            <br>
+
+            Goal:
+            ${goalResult.goalHours} hours/day
+
+            <br><br>
+
+            Current monthly energy:
+            ${goalResult.currentMonthlyEnergy.toFixed(2)}
+            kWh
+
+            <br>
+
+            Goal monthly energy:
+            ${goalResult.goalMonthlyEnergy.toFixed(2)}
+            kWh
+
+            <br>
+
+            Current monthly cost:
+            ₹${goalResult.currentMonthlyCost.toFixed(2)}
+
+            <br>
+
+            Goal monthly cost:
+            ₹${goalResult.goalMonthlyCost.toFixed(2)}
+
+            <br><br>
+
+            <span class="money-positive">
+
+                ✅ SAVING
+
+                <br>
+
+                ${goalResult.hoursDifference.toFixed(2)}
+                fewer hour(s)/day
+
+                <br>
+
+                ${goalResult.energyDifference.toFixed(2)}
+                kWh saved/month
+
+                <br>
+
+                ₹${goalResult.moneyDifference.toFixed(2)}
+                saved/month
+
+            </span>
+
+        `;
+
+    }
+    else {
+
+        result.innerHTML = `
+
+            <strong>${appliance.name}</strong>
+
+            <br>
+
+            Current usage:
+            ${goalResult.currentHours} hours/day
+
+            <br>
+
+            Goal:
+            ${goalResult.goalHours} hours/day
+
+            <br><br>
+
+            Current monthly energy:
+            ${goalResult.currentMonthlyEnergy.toFixed(2)}
+            kWh
+
+            <br>
+
+            Current monthly cost:
+            ₹${goalResult.currentMonthlyCost.toFixed(2)}
+
+            <br><br>
+
+            <span class="goal-met">
+
+                🎯 GOAL MET
+
+                <br>
+
+                Your current usage is exactly
+                equal to your goal.
+
+                <br>
+
+                Energy difference:
+                0 kWh/month
+
+                <br>
+
+                Cost difference:
+                ₹0/month
+
+            </span>
+
+        `;
+
+    }
+
+}
+
+
+/* =========================================================
+   SET PAGE APPLIANCE GOAL
+========================================================= */
+
+function setPageApplianceGoal() {
+
+    const index =
+        document.getElementById(
+            "pageGoalAppliance"
+        ).value;
+
+
+    const goalHours =
+        Number(
+            document.getElementById(
+                "pageGoalHours"
+            ).value
+        );
+
+
+    if (index === "") {
+
+        alert("Please select an appliance.");
+
+        return;
+
+    }
+
+
+    if (goalHours <= 0) {
+
+        alert("Please enter a goal greater than 0 hours.");
+
+        return;
+
+    }
+
+
+    appliances[Number(index)].goalHours =
+        goalHours;
+
+
+    saveData();
+
+    refreshAll();
+
+
+    document.getElementById(
+        "pageGoalAppliance"
+    ).value = index;
+
+
+    document.getElementById(
+        "pageGoalHours"
+    ).value = "";
+
+
+    showPageApplianceGoal();
+
+}
+
+
+/* =========================================================
+   MONTHLY DATA
+========================================================= */
+
+function addMonth() {
+
+    const month =
+        document.getElementById(
+            "monthName"
+        ).value.trim();
+
+
+    const energy =
+        Number(
+            document.getElementById(
+                "monthEnergy"
+            ).value
+        );
+
+
+    if (!month || energy < 0) {
+
+        alert("Please enter valid monthly data.");
+
+        return;
+
+    }
+
+
+    const existing =
+        monthlyData.findIndex(
+            item =>
+                item.month.toLowerCase() ===
+                month.toLowerCase()
+        );
+
+
+    if (existing !== -1) {
+
+        monthlyData[existing].energy =
+            energy;
+
+    }
+    else {
+
+        monthlyData.push({
+
+            month: month,
+
+            energy: energy
+
+        });
+
+    }
+
+
+    saveData();
+
+    refreshAll();
+
+
+    document.getElementById(
+        "monthName"
+    ).value = "";
+
+    document.getElementById(
+        "monthEnergy"
+    ).value = "";
+
+}
+
+
+/* =========================================================
+   MONTHLY TABLE
+========================================================= */
+
+function updateMonthlyTable() {
+
+    const table =
+        document.getElementById(
+            "monthlyTable"
+        );
+
+
+    table.innerHTML = "";
+
+
+    monthlyData.forEach((item, index) => {
+
+        const row =
+            document.createElement("tr");
+
+
+        row.innerHTML = `
+
+            <td>
+                ${item.month}
+            </td>
+
+            <td>
+                ${Number(item.energy).toFixed(2)}
+            </td>
+
+            <td>
+
+                <button
+                    class="delete-btn"
+                    onclick="deleteMonth(${index})">
+
+                    Delete
+
+                </button>
+
+            </td>
+
+        `;
+
+
+        table.appendChild(row);
+
+    });
+
+}
+
+
+/* =========================================================
+   DELETE MONTH
+========================================================= */
+
+function deleteMonth(index) {
+
+    if (
+        !confirm(
+            "Delete this monthly record?"
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    monthlyData.splice(index, 1);
+
+    saveData();
+
+    refreshAll();
+
+}
+
+
+/* =========================================================
+   MONTHLY ENERGY
+========================================================= */
+
+function getCurrentMonthlyEnergy() {
+
+    if (monthlyData.length > 0) {
+
+        return Number(
+            monthlyData[monthlyData.length - 1].energy
+        ) || 0;
+
+    }
+
+
+    return appliances.reduce(
+
+        (total, appliance) => {
+
+            return total +
+                monthlyKwh(appliance);
+
+        },
+
+        0
+
+    );
+
+}
+
+
+/* =========================================================
+   AVERAGE RATE
+========================================================= */
+
+function getAverageRate() {
+
+    if (appliances.length === 0) {
+
+        return 8;
+
+    }
+
+
+    const totalRate =
+        appliances.reduce(
+
+            (sum, appliance) => {
+
+                return sum +
+                    Number(appliance.rate);
+
+            },
+
+            0
+
+        );
+
+
+    return totalRate / appliances.length;
+
+}
+
+
+/* =========================================================
+   MONTHLY GOAL COMPARISON
+========================================================= */
+
+function getMonthlyGoalComparison() {
+
+    if (monthlyGoal <= 0) {
+
+        return null;
+
+    }
+
+
+    const current =
+        getCurrentMonthlyEnergy();
+
+
+    const rate =
+        getAverageRate();
+
+
+    const difference =
+        current - monthlyGoal;
+
+
+    return {
+
+        current: current,
+
+        goal: monthlyGoal,
+
+        difference: Math.abs(difference),
+
+        moneyDifference:
+            Math.abs(difference) * rate,
+
+        rate: rate,
+
+        status:
+            difference > 0
+                ? "extra"
+                : difference < 0
+                    ? "saving"
+                    : "met"
+
+    };
+
+}
+
+
+/* =========================================================
+   MONTHLY GOAL DISPLAY
+========================================================= */
+
+function updateGoalDisplays() {
+
+    const dashBar =
+        document.getElementById(
+            "dashGoalBar"
+        );
+
+    const goalBar =
+        document.getElementById(
+            "goalBar"
+        );
+
+    const dashText =
+        document.getElementById(
+            "dashGoalText"
+        );
+
+    const goalText =
+        document.getElementById(
+            "goalText"
+        );
+
+
+    const comparison =
+        getMonthlyGoalComparison();
+
+
+    if (!comparison) {
+
+        dashBar.style.width = "0%";
+
+        goalBar.style.width = "0%";
+
+        dashText.innerHTML =
+            "No monthly goal set.";
+
+        goalText.innerHTML =
+            "No goal set.";
+
+        return;
+
+    }
+
+
+    const percentage =
+        Math.min(
+            100,
+            (comparison.current /
+                comparison.goal) * 100
+        );
+
+
+    dashBar.style.width =
+        percentage + "%";
+
+    goalBar.style.width =
+        percentage + "%";
+
+
+    let message = "";
+
+
+    if (comparison.status === "extra") {
+
+        message = `
+
+            <span class="money-negative">
+
+                ⚠️ You are
+                ${comparison.difference.toFixed(2)}
+                kWh above your monthly goal.
+
+                <br>
+
+                Estimated extra cost:
+                ₹${comparison.moneyDifference.toFixed(2)}
+                per month.
+
+            </span>
+
+            <br>
+
+            Current:
+            ${comparison.current.toFixed(2)}
+            kWh
+
+            <br>
+
+            Goal:
+            ${comparison.goal.toFixed(2)}
+            kWh
+
+        `;
+
+    }
+    else if (comparison.status === "saving") {
+
+        message = `
+
+            <span class="money-positive">
+
+                ✅ You are saving
+                ${comparison.difference.toFixed(2)}
+                kWh compared with your goal.
+
+                <br>
+
+                Estimated saving:
+                ₹${comparison.moneyDifference.toFixed(2)}
+                per month.
+
+            </span>
+
+            <br>
+
+            Current:
+            ${comparison.current.toFixed(2)}
+            kWh
+
+            <br>
+
+            Goal:
+            ${comparison.goal.toFixed(2)}
+            kWh
+
+        `;
+
+    }
+    else {
+
+        message = `
+
+            <span class="goal-met">
+
+                🎯 Monthly goal met.
+
+                <br>
+
+                Current usage is exactly equal
+                to your goal.
+
+            </span>
+
+            <br>
+
+            Current:
+            ${comparison.current.toFixed(2)}
+            kWh
+
+            <br>
+
+            Goal:
+            ${comparison.goal.toFixed(2)}
+            kWh
+
+        `;
+
+    }
+
+
+    dashText.innerHTML =
+        message;
+
+    goalText.innerHTML =
+        message;
+
+
+    const dashboardInput =
+        document.getElementById(
+            "dashboardMonthlyGoal"
+        );
+
+
+    const pageInput =
+        document.getElementById(
+            "pageMonthlyGoal"
+        );
+
+
+    if (document.activeElement !== dashboardInput) {
+
+        dashboardInput.value =
+            monthlyGoal || "";
+
+    }
+
+
+    if (document.activeElement !== pageInput) {
+
+        pageInput.value =
+            monthlyGoal || "";
+
+    }
+
+}
+
+
+/* =========================================================
+   SET MONTHLY GOAL
+========================================================= */
+
+function setMonthlyGoal() {
+
+    const goal =
+        Number(
+            document.getElementById(
+                "dashboardMonthlyGoal"
+            ).value
+        );
+
+
+    if (goal <= 0) {
+
+        alert(
+            "Please enter a monthly goal greater than 0."
+        );
+
+        return;
+
+    }
+
+
+    monthlyGoal = goal;
+
+    saveData();
+
+    refreshAll();
+
+}
+
+
+/* =========================================================
+   SET GOAL FROM GOALS PAGE
+========================================================= */
+
+function setGoal() {
+
+    const goal =
+        Number(
+            document.getElementById(
+                "pageMonthlyGoal"
+            ).value
+        );
+
+
+    if (goal <= 0) {
+
+        alert(
+            "Please enter a monthly goal greater than 0."
+        );
+
+        return;
+
+    }
+
+
+    monthlyGoal = goal;
+
+    saveData();
+
+    refreshAll();
+
+}
+
+
+/* =========================================================
+   DASHBOARD STATISTICS
+========================================================= */
+
+function updateDashboard() {
+
+    const totalEnergy =
+        appliances.reduce(
+
+            (sum, appliance) => {
+
+                return sum +
+                    monthlyKwh(appliance);
+
+            },
+
+            0
+
+        );
+
+
+    const totalCost =
+        appliances.reduce(
+
+            (sum, appliance) => {
+
+                return sum +
+                    monthlyCost(appliance);
+
+            },
+
+            0
+
+        );
+
+
+    document.getElementById(
+        "totalAppliances"
+    ).textContent =
+        appliances.length;
+
+
+    document.getElementById(
+        "dashboardEnergy"
+    ).textContent =
+        totalEnergy.toFixed(2) + " kWh";
+
+
+    document.getElementById(
+        "dashboardCost"
+    ).textContent =
+        "₹" + totalCost.toFixed(2);
+
+}
+
+
+/* =========================================================
+   MOST USED
+========================================================= */
+
+function updateMostUsed() {
+
+    const element =
+        document.getElementById(
+            "mostUsed"
+        );
+
+
+    if (appliances.length === 0) {
+
+        element.innerHTML =
+            "No appliances added yet.";
+
+        return;
+
+    }
+
+
+    let highest =
+        appliances[0];
+
+
+    appliances.forEach(appliance => {
+
+        if (
+            monthlyKwh(appliance) >
+            monthlyKwh(highest)
+        ) {
+
+            highest = appliance;
+
+        }
+
+    });
+
+
+    element.innerHTML = `
+
+        <strong>${highest.name}</strong>
+
+        is your most used appliance.
+
+        <br>
+
+        Monthly energy:
+        <span class="highlight">
+            ${monthlyKwh(highest).toFixed(2)} kWh
+        </span>
+
+        <br>
+
+        Monthly cost:
+        <span class="highlight">
+            ₹${monthlyCost(highest).toFixed(2)}
+        </span>
+
+    `;
+
+}
+
+
+/* =========================================================
+   SMART SUMMARY
+========================================================= */
+
+function updateSmartSummary() {
+
+    const element =
+        document.getElementById(
+            "smartSummary"
+        );
+
+
+    if (appliances.length === 0) {
+
+        element.innerHTML =
+            "Add appliances to generate a summary.";
+
+        return;
+
+    }
+
+
+    const energy =
+        appliances.reduce(
+
+            (sum, appliance) =>
+                sum + monthlyKwh(appliance),
+
+            0
+
+        );
+
+
+    const cost =
+        appliances.reduce(
+
+            (sum, appliance) =>
+                sum + monthlyCost(appliance),
+
+            0
+
+        );
+
+
+    const goalCount =
+        appliances.filter(
+
+            appliance =>
+                Number(appliance.goalHours) > 0
+
+        ).length;
+
+
+    element.innerHTML = `
+
+        You have added
+        <strong>${appliances.length}</strong>
+        appliance(s).
+
+        <br>
+
+        Estimated monthly consumption:
+        <strong>${energy.toFixed(2)} kWh</strong>
+
+        <br>
+
+        Estimated monthly electricity cost:
+        <strong>₹${cost.toFixed(2)}</strong>
+
+        <br>
+
+        Appliance goals set:
+        <strong>${goalCount}</strong>
+
+    `;
+
+}
+
+
+/* =========================================================
+   SAVING SCORE
+========================================================= */
+
+function updateSavingScore() {
+
+    // Kept simple for the project dashboard.
+
+}
+
+
+/* =========================================================
+   APPLIANCE CHART
+========================================================= */
+
+function updateApplianceChart() {
+
+    const chart =
+        document.getElementById(
+            "applianceChart"
+        );
+
+
+    chart.innerHTML = "";
+
+
+    if (appliances.length === 0) {
+
+        chart.innerHTML =
+            "<p>No appliance data available.</p>";
+
+        return;
+
+    }
+
+
+    const maximum =
+        Math.max(
+
+            ...appliances.map(
+                appliance =>
+                    monthlyKwh(appliance)
+            )
+
+        );
+
+
+    appliances.forEach(appliance => {
+
+        const column =
+            document.createElement("div");
+
+        column.className =
+            "chart-column";
+
+
+        const bar =
+            document.createElement("div");
+
+        bar.className =
+            "bar";
+
+
+        const height =
+            maximum > 0
+                ? (
+                    monthlyKwh(appliance) /
+                    maximum
+                ) * 180
+                : 2;
+
+
+        bar.style.height =
+            Math.max(2, height) + "px";
+
+
+        bar.title =
+            appliance.name +
+            ": " +
+            monthlyKwh(appliance).toFixed(2) +
+            " kWh";
+
+
+        const label =
+            document.createElement("div");
+
+        label.className =
+            "chart-label";
+
+        label.textContent =
+            appliance.name;
+
+
+        column.appendChild(bar);
+
+        column.appendChild(label);
+
+        chart.appendChild(column);
+
+    });
+
+}
+
+
+/* =========================================================
+   MONTHLY CHART
+========================================================= */
+
+function buildMonthlyChart(id) {
+
+    const chart =
+        document.getElementById(id);
+
+
+    if (!chart) return;
+
+
+    chart.innerHTML = "";
+
+
+    if (monthlyData.length === 0) {
+
+        chart.innerHTML =
+            "<p>No monthly data available.</p>";
+
+        return;
+
+    }
+
+
+    const maximum =
+        Math.max(
+
+            ...monthlyData.map(
+                item =>
+                    Number(item.energy)
+            )
+
+        );
+
+
+    monthlyData.forEach(item => {
+
+        const column =
+            document.createElement("div");
+
+        column.className =
+            "chart-column";
+
+
+        const bar =
+            document.createElement("div");
+
+        bar.className =
+            "bar";
+
+
+        const height =
+            maximum > 0
+                ? (
+                    Number(item.energy) /
+                    maximum
+                ) * 180
+                : 2;
+
+
+        bar.style.height =
+            Math.max(2, height) + "px";
+
+
+        bar.title =
+            item.energy + " kWh";
+
+
+        const label =
+            document.createElement("div");
+
+        label.className =
+            "chart-label";
+
+        label.textContent =
+            item.month;
+
+
+        column.appendChild(bar);
+
+        column.appendChild(label);
+
+        chart.appendChild(column);
+
+    });
+
+}
+
+
+/* =========================================================
+   ANALYSIS
+========================================================= */
+
+function updateAnalysis() {
+
+    const element =
+        document.getElementById(
+            "analysisContent"
+        );
+
+
+    if (appliances.length === 0) {
+
+        element.innerHTML =
+            "Add appliances to generate analysis.";
+
+        return;
+
+    }
+
+
+    const totalEnergy =
+        appliances.reduce(
+
+            (sum, appliance) =>
+                sum + monthlyKwh(appliance),
+
+            0
+
+        );
+
+
+    const totalCost =
+        appliances.reduce(
+
+            (sum, appliance) =>
+                sum + monthlyCost(appliance),
+
+            0
+
+        );
+
+
+    let highest =
+        appliances[0];
+
+
+    appliances.forEach(appliance => {
+
+        if (
+            monthlyKwh(appliance) >
+            monthlyKwh(highest)
+        ) {
+
+            highest = appliance;
+
+        }
+
+    });
+
+
+    let recommendations = [];
+
+
+    appliances.forEach(appliance => {
+
+        const goal =
+            getApplianceGoalResult(appliance);
+
+
+        if (goal && goal.status === "extra") {
+
+            recommendations.push(`
+
+                <li>
+
+                    <strong>${appliance.name}</strong>:
+                    You are using
+                    ${goal.hoursDifference.toFixed(2)}
+                    extra hour(s)/day.
+
+                    This is approximately
+                    ₹${goal.moneyDifference.toFixed(2)}
+                    extra per month.
+
+                </li>
+
+            `);
+
+        }
+
+    });
+
+
+    if (recommendations.length === 0) {
+
+        recommendations.push(`
+
+            <li>
+                Set appliance usage goals to receive
+                more detailed saving recommendations.
+            </li>
+
+        `);
+
+    }
+
+
+    element.innerHTML = `
+
+        <p>
+            Total estimated monthly energy:
+            <strong>${totalEnergy.toFixed(2)} kWh</strong>
+        </p>
+
+        <p>
+            Total estimated monthly cost:
+            <strong>₹${totalCost.toFixed(2)}</strong>
+        </p>
+
+        <p>
+            Highest energy consuming appliance:
+            <strong>${highest.name}</strong>
+        </p>
+
+        <h3>Recommendations</h3>
+
+        <ul>
+            ${recommendations.join("")}
+        </ul>
+
+    `;
+
+}
+
+
+/* =========================================================
+   TOTAL ENERGY & COST
+========================================================= */
+
+function updateTotalCost() {
+
+    const element =
+        document.getElementById(
+            "totalCostContent"
+        );
+
+
+    const applianceEnergy =
+        appliances.reduce(
+
+            (sum, appliance) =>
+                sum + monthlyKwh(appliance),
+
+            0
+
+        );
+
+
+    const applianceCost =
+        appliances.reduce(
+
+            (sum, appliance) =>
+                sum + monthlyCost(appliance),
+
+            0
+
+        );
+
+
+    const monthlyRecordedEnergy =
+        monthlyData.reduce(
+
+            (sum, item) =>
+                sum + Number(item.energy),
+
+            0
+
+        );
+
+
+    const averageRate =
+        getAverageRate();
+
+
+    const recordedCost =
+        monthlyRecordedEnergy *
+        averageRate;
+
+
+    element.innerHTML = `
+
+        <h3>Appliance Based Estimate</h3>
+
+        <p>
+            Monthly energy:
+            <strong>
+                ${applianceEnergy.toFixed(2)} kWh
+            </strong>
+        </p>
+
+        <p>
+            Monthly cost:
+            <strong>
+                ₹${applianceCost.toFixed(2)}
+            </strong>
+        </p>
+
+        <hr>
+
+        <h3>Recorded Monthly Usage</h3>
+
+        <p>
+            Total recorded energy:
+            <strong>
+                ${monthlyRecordedEnergy.toFixed(2)} kWh
+            </strong>
+        </p>
+
+        <p>
+            Estimated recorded cost:
+            <strong>
+                ₹${recordedCost.toFixed(2)}
+            </strong>
+        </p>
+
+    `;
+
+}
+
+
+/* =========================================================
+   SAVINGS CALCULATOR
+========================================================= */
+
+function calculateSavings() {
+
+    const current =
+        Number(
+            document.getElementById(
+                "currentEnergy"
+            ).value
+        );
+
+
+    const reduction =
+        Number(
+            document.getElementById(
+                "reductionPercent"
+            ).value
+        );
+
+
+    const rate =
+        Number(
+            document.getElementById(
+                "calculatorRate"
+            ).value
+        );
+
+
+    const result =
+        document.getElementById(
+            "savingResult"
+        );
+
+
+    if (
+        current <= 0 ||
+        reduction < 0 ||
+        reduction > 100 ||
+        rate <= 0
+    ) {
+
+        alert("Please enter valid values.");
+
+        return;
+
+    }
+
+
+    const savedEnergy =
+        current *
+        reduction /
+        100;
+
+
+    const newEnergy =
+        current -
+        savedEnergy;
+
+
+    const moneySaved =
+        savedEnergy *
+        rate;
+
+
+    const newCost =
+        newEnergy *
+        rate;
+
+
+    result.innerHTML = `
+
+        Energy saved:
+        <strong>
+            ${savedEnergy.toFixed(2)} kWh/month
+        </strong>
+
+        <br>
+
+        New energy usage:
+        <strong>
+            ${newEnergy.toFixed(2)} kWh/month
+        </strong>
+
+        <br>
+
+        Money saved:
+        <strong>
+            ₹${moneySaved.toFixed(2)}/month
+        </strong>
+
+        <br>
+
+        New estimated cost:
+        <strong>
+            ₹${newCost.toFixed(2)}/month
+        </strong>
+
+    `;
+
+}
+
+
+/* =========================================================
+   MONEY APPLIANCE INFO
+========================================================= */
+
+function updateMoneyApplianceInfo() {
+
+    const index =
+        document.getElementById(
+            "moneyAppliance"
+        ).value;
+
+
+    const element =
+        document.getElementById(
+            "moneyApplianceInfo"
+        );
+
+
+    if (index === "") {
+
+        element.innerHTML =
+            "Select an appliance.";
+
+        return;
+
+    }
+
+
+    const appliance =
+        appliances[Number(index)];
+
+
+    if (!appliance) return;
+
+
+    element.innerHTML = `
+
+        <strong>${appliance.name}</strong>
+
+        <br>
+
+        Current usage:
+        ${appliance.hours} hours/day
+
+        <br>
+
+        Current monthly energy:
+        ${monthlyKwh(appliance).toFixed(2)} kWh
+
+        <br>
+
+        Current monthly cost:
+        ₹${monthlyCost(appliance).toFixed(2)}
+
+    `;
+
+}
+
+
+/* =========================================================
+   APPLIANCE MONEY IMPACT
+========================================================= */
+
+function calculateApplianceMoneyImpact() {
+
+    const index =
+        document.getElementById(
+            "moneyAppliance"
+        ).value;
+
+
+    const newHours =
+        Number(
+            document.getElementById(
+                "newApplianceHours"
+            ).value
+        );
+
+
+    const result =
+        document.getElementById(
+            "applianceMoneyResult"
+        );
+
+
+    if (index === "") {
+
+        alert("Please select an appliance.");
+
+        return;
+
+    }
+
+
+    if (newHours < 0) {
+
+        alert("Please enter valid hours.");
+
+        return;
+
+    }
+
+
+    const appliance =
+        appliances[Number(index)];
+
+
+    const currentEnergy =
+        monthlyKwh(appliance);
+
+
+    const currentCost =
+        monthlyCost(appliance);
+
+
+    const newEnergy =
+        (
+            Number(appliance.power) *
+            newHours *
+            Number(appliance.quantity) *
+            30
+        ) / 1000;
+
+
+    const newCost =
+        newEnergy *
+        Number(appliance.rate);
+
+
+    const energyDifference =
+        Math.abs(
+            currentEnergy - newEnergy
+        );
+
+
+    const moneyDifference =
+        Math.abs(
+            currentCost - newCost
+        );
+
+
+    if (newHours < appliance.hours) {
+
+        result.innerHTML = `
+
+            Reducing usage from
+            ${appliance.hours} to
+            ${newHours} hours/day
+
+            <br>
+
+            Energy saved:
+            <strong>
+                ${energyDifference.toFixed(2)} kWh/month
+            </strong>
+
+            <br>
+
+            Money saved:
+            <strong>
+                ₹${moneyDifference.toFixed(2)}/month
+            </strong>
+
+            <br>
+
+            New monthly cost:
+            ₹${newCost.toFixed(2)}
+
+        `;
+
+    }
+    else if (newHours > appliance.hours) {
+
+        result.innerHTML = `
+
+            Increasing usage from
+            ${appliance.hours} to
+            ${newHours} hours/day
+
+            <br>
+
+            Extra energy:
+            <strong>
+                ${energyDifference.toFixed(2)} kWh/month
+            </strong>
+
+            <br>
+
+            Extra cost:
+            <strong>
+                ₹${moneyDifference.toFixed(2)}/month
+            </strong>
+
+            <br>
+
+            New monthly cost:
+            ₹${newCost.toFixed(2)}
+
+        `;
+
+    }
+    else {
+
+        result.innerHTML = `
+
+            Usage is unchanged.
+
+            <br>
+
+            Energy difference:
+            <strong>0 kWh/month</strong>
+
+            <br>
+
+            Cost difference:
+            <strong>₹0/month</strong>
+
+        `;
+
+    }
+
+}
+
+
+/* =========================================================
+   MONTHLY MONEY IMPACT
+========================================================= */
+
+function calculateMonthlyMoneyImpact() {
+
+    const newEnergy =
+        Number(
+            document.getElementById(
+                "newMonthlyEnergy"
+            ).value
+        );
+
+
+    const result =
+        document.getElementById(
+            "monthlyMoneyResult"
+        );
+
+
+    if (newEnergy < 0) {
+
+        alert("Please enter valid energy.");
+
+        return;
+
+    }
+
+
+    const currentEnergy =
+        getCurrentMonthlyEnergy();
+
+
+    const rate =
+        getAverageRate();
+
+
+    const currentCost =
+        currentEnergy * rate;
+
+
+    const newCost =
+        newEnergy * rate;
+
+
+    const difference =
+        Math.abs(
+            currentEnergy - newEnergy
+        );
+
+
+    const moneyDifference =
+        Math.abs(
+            currentCost - newCost
+        );
+
+
+    if (newEnergy < currentEnergy) {
+
+        result.innerHTML = `
+
+            Energy saved:
+            <strong>
+                ${difference.toFixed(2)} kWh/month
+            </strong>
+
+            <br>
+
+            Money saved:
+            <strong>
+                ₹${moneyDifference.toFixed(2)}/month
+            </strong>
+
+            <br>
+
+            New estimated cost:
+            ₹${newCost.toFixed(2)}
+
+        `;
+
+    }
+    else if (newEnergy > currentEnergy) {
+
+        result.innerHTML = `
+
+            Extra energy:
+            <strong>
+                ${difference.toFixed(2)} kWh/month
+            </strong>
+
+            <br>
+
+            Extra cost:
+            <strong>
+                ₹${moneyDifference.toFixed(2)}/month
+            </strong>
+
+            <br>
+
+            New estimated cost:
+            ₹${newCost.toFixed(2)}
+
+        `;
+
+    }
+    else {
+
+        result.innerHTML = `
+
+            Usage is unchanged.
+
+            <br>
+
+            Energy difference:
+            <strong>0 kWh/month</strong>
+
+            <br>
+
+            Cost difference:
+            <strong>₹0/month</strong>
+
+        `;
+
+    }
+
+}
+
+
+/* =========================================================
+   REFRESH EVERYTHING
+========================================================= */
+
+function refreshAll() {
+
+    updateApplianceTable();
+
+    updateMonthlyTable();
+
+    updateApplianceDropdowns();
+
+    updateDashboard();
+
+    updateMostUsed();
+
+    updateSmartSummary();
+
+    updateSavingScore();
+
+    updateApplianceChart();
+
+    buildMonthlyChart("monthlyChart");
+
+    buildMonthlyChart("monthlyChartPage");
+
+    updateGoalDisplays();
+
+    updateAnalysis();
+
+    updateTotalCost();
+
+}
+
+
+/* =========================================================
+   PAGE LOAD
+========================================================= */
+
+window.onload = function() {
+
+    const savedUser =
+        localStorage.getItem(
+            "electricityUser"
+        );
+
+
+    if (savedUser) {
+
+        document.getElementById(
+            "loginPage"
+        ).style.display = "none";
+
+
+        document.getElementById(
+            "mainApp"
+        ).style.display = "block";
+
+
+        document.getElementById(
+            "welcomeName"
+        ).textContent =
+            savedUser;
+
+
+        loadData();
+
+        refreshAll();
+
+    }
+
+};
+
+</script>
+
+</body>
+</html>
